@@ -1,0 +1,183 @@
+/**
+ * A sword is created automatically when a man is created 
+ * face left by default
+ * its slash can hit 2 units from its hold location
+ */
+
+class Sword {
+	field int direction; // 0 = left, 1 = up, 2 = right, 3 = down
+	field int hold_location;
+	field int slash_location; // where the slash hit at
+	
+	constructor Sword new(int setLocation) {
+		let direction = 0;
+		let hold_location = setLocation;
+		let slash_location = hold_location - 2;
+		return this;
+	}
+	
+	method void dispose() {
+		do Memory.deAlloc(this);
+		return;
+	}
+
+	method void draw(int location) {
+		if (direction = 1) {
+			do slash_up(location-512);
+			do Sys.wait(100);
+			do slash_clear(location-512);
+			return;
+		}
+		if (direction = 2) {
+			do slash_right(location + 1);
+			do Sys.wait(100);
+			do slash_clear(location + 1);
+			return;
+		}
+		if (direction = 3) {
+			do slash_down(location+1024);
+			do Sys.wait(100);
+			do slash_clear(location+1024);
+			return;
+		}
+		if (direction = 0) {
+			do slash_left(location-1);
+			do Sys.wait(100);
+			do slash_clear(location-1);
+			return;
+		}
+		return;
+	}
+	
+	method int getDirection() {
+		return direction;
+	}
+	
+	method int getSlashLocation() {
+		return slash_location;
+	}
+	
+	method void setDirection(int newDirection) {
+		let direction = newDirection;
+		if (direction = 0) { let slash_location = hold_location - 2; }
+		if (direction = 1) { let slash_location = hold_location - 1024; }
+		if (direction = 2) { let slash_location = hold_location + 2; }
+		if (direction = 3) { let slash_location = hold_location + 1024; }
+		return;
+	}
+	
+	method void slash_clear(int location) {
+		var int memAddress; 
+		let memAddress = 16384+location;
+		// column 0
+		do Memory.poke(memAddress, 0);
+		do Memory.poke(memAddress +32, 0);
+		do Memory.poke(memAddress +64, 0);
+		do Memory.poke(memAddress +96, 0);
+		do Memory.poke(memAddress +128, 0);
+		do Memory.poke(memAddress +160, 0);
+		do Memory.poke(memAddress +192, 0);
+		do Memory.poke(memAddress +224, 0);
+		do Memory.poke(memAddress +256, 0);
+		do Memory.poke(memAddress +288, 0);
+		do Memory.poke(memAddress +320, 0);
+		do Memory.poke(memAddress +352, 0);
+		do Memory.poke(memAddress +384, 0);
+		do Memory.poke(memAddress +416, 0);
+		do Memory.poke(memAddress +448, 0);
+		do Memory.poke(memAddress +480, 0);
+		return;
+	}	
+
+	method void slash_down(int location) {
+		var int memAddress; 
+		let memAddress = 16384+location;
+		// column 0
+		do Memory.poke(memAddress, -16381);
+		do Memory.poke(memAddress +32, -24571);
+		do Memory.poke(memAddress +64, -24571);
+		do Memory.poke(memAddress +96, -28663);
+		do Memory.poke(memAddress +128, -28663);
+		do Memory.poke(memAddress +160, -28663);
+		do Memory.poke(memAddress +192, -30703);
+		do Memory.poke(memAddress +224, 17442);
+		do Memory.poke(memAddress +256, 16962);
+		do Memory.poke(memAddress +288, 8580);
+		do Memory.poke(memAddress +320, 8196);
+		do Memory.poke(memAddress +352, 4104);
+		do Memory.poke(memAddress +384, 2064);
+		do Memory.poke(memAddress +416, 1056);
+		do Memory.poke(memAddress +448, 576);
+		do Memory.poke(memAddress +480, 384);
+		return;
+	}
+	
+	method void slash_left(int location) {
+		var int memAddress; 
+		let memAddress = 16384+location;
+		// column 0
+		do Memory.poke(memAddress, -512);
+		do Memory.poke(memAddress +32, -32384);
+		do Memory.poke(memAddress +64, 24672);
+		do Memory.poke(memAddress +96, 7184);
+		do Memory.poke(memAddress +128, 520);
+		do Memory.poke(memAddress +160, 260);
+		do Memory.poke(memAddress +192, 130);
+		do Memory.poke(memAddress +224, 65);
+		do Memory.poke(memAddress +256, 65);
+		do Memory.poke(memAddress +288, 130);
+		do Memory.poke(memAddress +320, 260);
+		do Memory.poke(memAddress +352, 520);
+		do Memory.poke(memAddress +384, 7184);
+		do Memory.poke(memAddress +416, 24672);
+		do Memory.poke(memAddress +448, -32384);
+		do Memory.poke(memAddress +480, -512);
+		return;
+	}
+
+	method void slash_right(int location) {
+		var int memAddress; 
+		let memAddress = 16384+location;
+		// column 0
+		do Memory.poke(memAddress, 127);
+		do Memory.poke(memAddress +32, 385);
+		do Memory.poke(memAddress +64, 1542);
+		do Memory.poke(memAddress +96, 2104);
+		do Memory.poke(memAddress +128, 4160);
+		do Memory.poke(memAddress +160, 8320);
+		do Memory.poke(memAddress +192, 16640);
+		do Memory.poke(memAddress +224, -32256);
+		do Memory.poke(memAddress +256, -32256);
+		do Memory.poke(memAddress +288, 16640);
+		do Memory.poke(memAddress +320, 8320);
+		do Memory.poke(memAddress +352, 4160);
+		do Memory.poke(memAddress +384, 2104);
+		do Memory.poke(memAddress +416, 1542);
+		do Memory.poke(memAddress +448, 385);
+		do Memory.poke(memAddress +480, 127);
+		return;
+	}
+	
+	method void slash_up(int location) {
+		var int memAddress; 
+		let memAddress = 16384+location;
+		// column 0
+		do Memory.poke(memAddress, 384);
+		do Memory.poke(memAddress +32, 576);
+		do Memory.poke(memAddress +64, 1056);
+		do Memory.poke(memAddress +96, 2064);
+		do Memory.poke(memAddress +128, 4104);
+		do Memory.poke(memAddress +160, 8196);
+		do Memory.poke(memAddress +192, 8580);
+		do Memory.poke(memAddress +224, 16962);
+		do Memory.poke(memAddress +256, 17442);
+		do Memory.poke(memAddress +288, -30703);
+		do Memory.poke(memAddress +320, -28663);
+		do Memory.poke(memAddress +352, -28663);
+		do Memory.poke(memAddress +384, -28663);
+		do Memory.poke(memAddress +416, -24571);
+		do Memory.poke(memAddress +448, -24571);
+		do Memory.poke(memAddress +480, -16381);
+		return;
+	}
+}

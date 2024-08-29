@@ -1,0 +1,14 @@
+/** Calculate modulo */
+
+class Tools {
+	function int modulo(int dividend, int divider) {
+		var int outcome;
+		if (dividend = divider) { return 0; }
+		if((~(dividend > divider)) | (divider=0)) {
+			let outcome = dividend;
+		} else {
+			let outcome = dividend - (divider * Math.divide(dividend, divider));
+		}
+		return outcome;
+	}
+}

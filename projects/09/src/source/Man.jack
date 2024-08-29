@@ -1,0 +1,188 @@
+/** 
+ * create a man and a sword 
+ * face left by default 
+ * can set its location
+ * setting its direction changes his sword's direction
+ * have methods that draw itself depending on the direction being set
+ */
+
+class Man {
+	field int location;
+	field Sword sword;
+	
+	constructor Man new(int setLocation) {
+		let location = setLocation;
+		let sword = Sword.new(setLocation);
+		do draw();
+		return this;
+	}
+	
+	method void dispose() {
+		do sword.dispose();
+		do Memory.deAlloc(this);
+		return;
+	}
+	
+	method void draw() {
+		if (sword.getDirection() = 0) {
+			do draw_clear();
+			do draw_left();
+			return;
+		}
+		if (sword.getDirection() = 1) {
+			do draw_clear();
+			do draw_up();
+			return;
+		}
+		if (sword.getDirection() = 2) {
+			do draw_clear();
+			do draw_right();
+			return;
+		}
+		else {
+			do draw_clear();
+			do draw_down();
+			return;
+		}
+	}
+	
+	method void draw_clear() {
+		var int memAddress; 
+		let memAddress = 16384+location;
+		// column 0
+		do Memory.poke(memAddress, 0);
+		do Memory.poke(memAddress +32, 0);
+		do Memory.poke(memAddress +64, 0);
+		do Memory.poke(memAddress +96, 0);
+		do Memory.poke(memAddress +128, 0);
+		do Memory.poke(memAddress +160, 0);
+		do Memory.poke(memAddress +192, 0);
+		do Memory.poke(memAddress +224, 0);
+		do Memory.poke(memAddress +256, 0);
+		do Memory.poke(memAddress +288, 0);
+		do Memory.poke(memAddress +320, 0);
+		do Memory.poke(memAddress +352, 0);
+		do Memory.poke(memAddress +384, 0);
+		do Memory.poke(memAddress +416, 0);
+		do Memory.poke(memAddress +448, 0);
+		do Memory.poke(memAddress +480, 0);
+		return;
+	}	
+	
+	method void draw_down() {
+		var int memAddress; 
+		let memAddress = 16384+location;
+		// column 0
+		do Memory.poke(memAddress, 17346);
+		do Memory.poke(memAddress +32, 17442);
+		do Memory.poke(memAddress +64, 19026);
+		do Memory.poke(memAddress +96, 18450);
+		do Memory.poke(memAddress +128, 17442);
+		do Memory.poke(memAddress +160, 17346);
+		do Memory.poke(memAddress +192, 17826);
+		do Memory.poke(memAddress +224, 18834);
+		do Memory.poke(memAddress +256, 20874);
+		do Memory.poke(memAddress +288, -7801);
+		do Memory.poke(memAddress +320, 16770);
+		do Memory.poke(memAddress +352, 384);
+		do Memory.poke(memAddress +384, 960);
+		do Memory.poke(memAddress +416, 1632);
+		do Memory.poke(memAddress +448, 3120);
+		do Memory.poke(memAddress +480, 6168);
+		return;
+	}
+	
+	method void draw_left() {
+		var int memAddress; 
+		let memAddress = 16384+location;
+		// column 0
+		do Memory.poke(memAddress, 32);
+		do Memory.poke(memAddress +32, 255);
+		do Memory.poke(memAddress +64, 160);
+		do Memory.poke(memAddress +96, 128);
+		do Memory.poke(memAddress +128, 384);
+		do Memory.poke(memAddress +160, 576);
+		do Memory.poke(memAddress +192, 1056);
+		do Memory.poke(memAddress +224, 1056);
+		do Memory.poke(memAddress +256, 1056);
+		do Memory.poke(memAddress +288, 1056);
+		do Memory.poke(memAddress +320, 576);
+		do Memory.poke(memAddress +352, 384);
+		do Memory.poke(memAddress +384, 128);
+		do Memory.poke(memAddress +416, 160);
+		do Memory.poke(memAddress +448, 255);
+		do Memory.poke(memAddress +480, 32);
+		return;
+	}
+	
+	method void draw_right() {
+		var int memAddress; 
+		let memAddress = 16384+location;
+		// column 0
+		do Memory.poke(memAddress, 32);
+		do Memory.poke(memAddress +32, 2040);
+		do Memory.poke(memAddress +64, 40);
+		do Memory.poke(memAddress +96, 8);
+		do Memory.poke(memAddress +128, 12);
+		do Memory.poke(memAddress +160, 18);
+		do Memory.poke(memAddress +192, 33);
+		do Memory.poke(memAddress +224, 33);
+		do Memory.poke(memAddress +256, 33);
+		do Memory.poke(memAddress +288, 33);
+		do Memory.poke(memAddress +320, 18);
+		do Memory.poke(memAddress +352, 12);
+		do Memory.poke(memAddress +384, 8);
+		do Memory.poke(memAddress +416, 40);
+		do Memory.poke(memAddress +448, 2040);
+		do Memory.poke(memAddress +480, 32);
+		return;
+	}
+	
+	method void draw_up() {
+		var int memAddress; 
+		let memAddress = 16384+location;
+		// column 0
+		do Memory.poke(memAddress, 17346);
+		do Memory.poke(memAddress +32, 17442);
+		do Memory.poke(memAddress +64, 18450);
+		do Memory.poke(memAddress +96, 18450);
+		do Memory.poke(memAddress +128, 17442);
+		do Memory.poke(memAddress +160, 17346);
+		do Memory.poke(memAddress +192, 17826);
+		do Memory.poke(memAddress +224, 18834);
+		do Memory.poke(memAddress +256, 20874);
+		do Memory.poke(memAddress +288, -7801);
+		do Memory.poke(memAddress +320, 16770);
+		do Memory.poke(memAddress +352, 384);
+		do Memory.poke(memAddress +384, 960);
+		do Memory.poke(memAddress +416, 1632);
+		do Memory.poke(memAddress +448, 3120);
+		do Memory.poke(memAddress +480, 6168);
+		return;
+	}
+
+	
+	method int getDirection() {
+		return sword.getDirection();
+	}
+	
+	method int getLocation() {
+		return location;
+	}
+	
+	method void setDirection(int direction) {
+		do sword.setDirection(direction);
+		do draw();
+		return;
+	}
+	
+	method int getSlashLocation() {
+		return sword.getSlashLocation();
+	}
+	
+	method void slash() {
+		do sword.draw(location);
+		return;
+	}
+	
+}

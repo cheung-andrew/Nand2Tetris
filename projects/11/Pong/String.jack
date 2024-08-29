@@ -1,0 +1,141 @@
+// This file is part of www.nand2tetris.org
+// and the book "The Elements of Computing Systems"
+// by Nisan and Schocken, MIT Press.
+// File name: projects/12/String.jack
+
+/**
+ * Represents character strings. In addition for constructing and disposing
+ * strings, the class features methods for getting and setting individual
+ * characters of the string, for erasing the string's last character,
+ * for appending a character to the string's end, and more typical
+ * string-oriented operations.
+ */
+class String {
+	field Array str;
+	field int length;
+	field int maxLength_this;
+	
+
+    /** constructs a new empty string with a maximum length of maxLength
+     *  and initial length of 0. */
+    constructor String new(int maxLength) {
+		if (maxLength = 0) {
+			let str = Array.new(1);
+		}
+		else { let str = Array.new(maxLength); }
+		let maxLength_this = maxLength;
+		let length = 0;
+		return this;
+    }
+
+    /** Disposes this string. */
+    method void dispose() {
+		do Memory.deAlloc(this);
+		return;
+    }
+
+    /** Returns the current length of this string. */
+    method int length() {
+		return length;
+    }
+
+    /** Returns the character at the j-th location of this string. */
+    method char charAt(int j) {
+		return str[j];
+    }
+
+    /** Sets the character at the j-th location of this string to c. */
+    method void setCharAt(int j, char c) {
+		let str[j] = c;
+		return;
+    }
+
+    /** Appends c to this string's end and returns this string. */
+    method String appendChar(char c) {
+		if (maxLength_this > length) {
+			do setCharAt(length, c);
+			let length = length + 1;
+			return this;
+		}
+		else { do Sys.error(17); return "error"; 
+		}
+		
+    }
+
+    /** Erases the last character from this string. */
+    method void eraseLastChar() {
+		let str[length] = 0;
+		if (length > 0) {
+			let length = length - 1;
+		}
+		return;
+    }
+
+    /** Returns the integer value of this string, 
+     *  until a non-digit character is detected. */
+    method int intValue() {
+		var int val, i, d;
+		let i = 0;
+		let val = 0;
+		while (i < length) {
+			if (((charAt(i) < 48) | (charAt(i) > 57)) & (~(charAt(i) = 45))) { return val; }
+			let d = charAt(i);
+			let val = val * 10 + d;
+			let i = i + 1;
+		}
+		return val;
+    }
+
+    /** Sets this string to hold a representation of the given value. */
+    method void setInt(int val) {
+		var boolean neg_number;
+		var int lastDigit, char_code, val_passing;
+		
+		if (val < 0) { 
+			let neg_number = true; 
+			let val_passing = val * -1;
+		} 
+		else { 
+			let neg_number = false; 
+			let val_passing = val;
+		}
+
+		let lastDigit = val_passing - (val_passing / 10 * 10);
+
+		let char_code = lastDigit + 48;
+
+		if (val_passing < 10) {
+			let length = 0;
+			if (neg_number) { do appendChar(45); }
+			do appendChar(char_code);
+			return;
+		}
+		else {
+			do setInt(val / 10);
+			do appendChar(char_code);
+		}
+		do Memory.deAlloc(neg_number);
+		do Memory.deAlloc(lastDigit);
+		do Memory.deAlloc(char_code);
+		do Memory.deAlloc(val_passing);
+		return;	
+    }
+	
+
+		
+
+    /** Returns the new line character. */
+    function char newLine() {
+		return 128;
+    }
+
+    /** Returns the backspace character. */
+    function char backSpace() {
+		return 129;
+    }
+
+    /** Returns the double quote (") character. */
+    function char doubleQuote() {
+		return 34;
+    }
+}

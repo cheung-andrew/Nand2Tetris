@@ -1,0 +1,113 @@
+/**
+ * When an enemy is created, it will randomly spawn at one of four locations 
+ * Has a killed status to calculate scores and stop drawing killed enemies
+ * Enemies move depending on its speed 
+ */
+
+class Enemy {
+	field int speed;
+	field int direction;
+	field int location;
+	field boolean killed;
+	
+	constructor Enemy new(int setDirection) { // 0 = left, 1 = up, 2 = right, 3 = down 
+		let direction = setDirection;
+		let killed = false;
+		if (direction = 0) { let location = 3592; }
+		if (direction = 1) { let location = 15; }
+		if (direction = 2) { let location = 3606; }
+		if (direction = 3) { let location = 7183; }
+		return this;
+	}
+	
+	/** move the enemy depending on its speed */
+	method void move(int frames_passed) {
+		var int m;
+		let m = Tools.modulo(frames_passed, speed);
+			if ((~killed) & (m = 0)) { // only draw and move the enemies that are not killed 
+			do clear();
+			if (direction = 0) { let location = location + 1; }
+			if (direction = 1) { let location = location + 512; }
+			if (direction = 2) { let location = location - 1; }
+			if (direction = 3) { let location = location - 512; }
+			do draw();
+			return;
+			}
+		return;
+	}
+
+	/** set enemy to be killed, so that it will not appear on screen */
+	method void setKilled() {
+		let killed = true;
+		return;
+	}
+	
+	method boolean getKilled() {
+		return killed;
+	}
+	
+	method int getLocation() {
+		return location;
+	}
+	
+	method int getDirection() {
+		return direction;
+	}
+		
+
+	method void setSpeed(int setSpeed) {
+		let speed = setSpeed;
+		return;
+	}
+	
+	method void clear() {
+		var int memAddress; 
+		let memAddress = 16384+location;
+		// column 0
+		do Memory.poke(memAddress, 0);
+		do Memory.poke(memAddress +32, 0);
+		do Memory.poke(memAddress +64, 0);
+		do Memory.poke(memAddress +96, 0);
+		do Memory.poke(memAddress +128, 0);
+		do Memory.poke(memAddress +160, 0);
+		do Memory.poke(memAddress +192, 0);
+		do Memory.poke(memAddress +224, 0);
+		do Memory.poke(memAddress +256, 0);
+		do Memory.poke(memAddress +288, 0);
+		do Memory.poke(memAddress +320, 0);
+		do Memory.poke(memAddress +352, 0);
+		do Memory.poke(memAddress +384, 0);
+		do Memory.poke(memAddress +416, 0);
+		do Memory.poke(memAddress +448, 0);
+		do Memory.poke(memAddress +480, 0);
+		return;
+	}	
+	
+	method void draw() {
+		var int memAddress;
+		let memAddress = 16384+location;
+		do Memory.poke(memAddress+0, 2016);
+		do Memory.poke(memAddress+32, 2064);
+		do Memory.poke(memAddress+64, 5736);
+		do Memory.poke(memAddress+96, 4676);
+		do Memory.poke(memAddress+128, 5140);
+		do Memory.poke(memAddress+160, 3044);
+		do Memory.poke(memAddress+192, -2044);
+		do Memory.poke(memAddress+224, -31768);
+		do Memory.poke(memAddress+256, 16912);
+		do Memory.poke(memAddress+288, 12561);
+		do Memory.poke(memAddress+320, 8403);
+		do Memory.poke(memAddress+352, 8213);
+		do Memory.poke(memAddress+384, 8217);
+		do Memory.poke(memAddress+416, 12290);
+		do Memory.poke(memAddress+448, 6156);
+		do Memory.poke(memAddress+480, 2040);
+		return;
+	}
+	
+	method void dispose() {
+		do Memory.deAlloc(this);
+		return;
+	}
+}
+	

@@ -1,0 +1,307 @@
+/**
+ * Slash Them All Game 
+ * The player need to kill 30 enemies to win
+ * A man yielding a sword will be created at the center when the game is instantiated, and enemies will spawn
+ * Press array keys to change the man's direction, Z key to slash. The slash spans 2 unit of space.
+ * Enemies will spawn gradually, and the game's pace will gradually get faster
+ * Exit: field variable to track if the game's status 
+ * frame_passed: the field variable to track time. It is designed to have 50 frames per second, so the advance_frames method will use the Sys.wait function to wait 20 secomds (1000 miliseconds / 50) every time it is called 
+ */
+
+class Game{
+	/** Declaring game's stat */
+	field int frames_passed, score;
+	field boolean exit;
+	field char key;
+	field int seed;
+
+	/** Declaring man */
+	field Man man;
+	
+	/** Declaring enemies and tools needed for creating the enemy array */
+	field Array enemies;
+	field Enemy current_enemy;
+	field int current_enemy_speed;	
+	field int enemy_counter; //for looping the enemy array
+	field int enemies_to_spawn; // for incrementing number of enemies to spawn
+	field int new_enemy_direction; // for tracking which random direction the enemy spawn 
+	
+	constructor Game new() {
+		
+		/** Initializing game related stats */
+		let score = 0; 
+		let frames_passed = 0;
+		let exit = true;
+		let man = Man.new(3599); // make a man at the center 
+		
+		/** Print game instructions */
+		do Output.moveCursor(0, 0);
+		do Output.printString("Press Enter to start.");
+		do Output.moveCursor(1, 0);
+		do Output.printString("Score: 0");
+		do Output.moveCursor(2, 0);
+		do Output.printString("Array keys to change direction");
+		do Output.moveCursor(3, 0);
+		do Output.printString("Z key to slash 2 units far");
+		do Output.moveCursor(4, 0);
+		do Output.printString("Get 30 scores to win");
+		return this;
+	}
+	
+	/** tracking time, or how many frames has been passed */
+	method int advance_frames(int frames_passed) {
+		do Sys.wait(20);
+		let frames_passed = frames_passed + 1;
+		return frames_passed;
+	}
+	
+	/** check if player gets 30 scores */
+	method void checkWin() {
+		if (score = 30) {
+			do Output.moveCursor(0, 0);
+			do Output.printString("Congrat! You Win!");
+			let exit = true;
+			let enemy_counter = 0;
+			while (enemy_counter < enemies_to_spawn) {
+				let current_enemy = enemies[enemy_counter];
+				do current_enemy.dispose();
+				let enemy_counter = enemy_counter + 1;
+			}
+			return;
+		}
+		return;
+	}
+	
+	/** Decide if man and enemy collide */
+	method void collide(Man man, Enemy enemy) {
+		if (man.getLocation() = enemy.getLocation()) {
+			do Output.moveCursor(0, 0);
+			do Output.printString("You Lose!");
+			let exit = true;
+			let enemy_counter = 0;
+			while (enemy_counter < enemies_to_spawn) {
+				let current_enemy = enemies[enemy_counter];
+				do current_enemy.dispose();
+				let enemy_counter = enemy_counter + 1;
+			}
+			return;
+		}
+		return;
+	}
+
+	method void dispose() {
+		do man.dispose();
+		do Memory.deAlloc(this);
+		return;
+	}
+	
+	/** spawn enemies faster for every 10 scores gained */
+	method int getSpawnSpeed() {
+		if (score < 11) {
+			return 40;
+		}
+		if (score < 21) {
+			return 25;
+		}
+		return 10;
+	}	
+	
+	/** Determine if the enemy is within the range of slash */
+	method boolean inRange(int man_direction, int enemy_direction, int man_location, int enemy_location) {
+		var int distance;
+		if (man_direction = enemy_direction) {
+			if ((man_direction = 0) | (man_direction = 2)) {
+				let distance = Math.sqrt((man_location - enemy_location) * (man_location - enemy_location));
+				if (distance < 3) {
+					return true;
+				}
+				return false;
+			} 
+			if (man_direction = 1) {
+				if (man_location - enemy_location < 1536) { return true; }
+				return false;
+			}
+			if (man_direction = 3) {
+				if (enemy_location - man_location < 1536) { return true; }
+				return false;
+			}
+			return false;
+		}
+		return false;
+	}
+	
+	/** Determine if the enemy get killed by slash */
+	method void kill(Man man, Enemy enemy) {
+		var boolean in_range;
+		var boolean killed;
+		let in_range = inRange(man.getDirection(), enemy.getDirection(), man.getLocation(), enemy.getLocation());
+		let killed = enemy.getKilled();
+		if (killed) { // if the enemy is killed, skipping it
+			let in_range = false;
+		}
+		if (in_range) {
+			do enemy.clear();
+			do enemy.setKilled();
+			do enemy.dispose();
+			let score = score + 1;
+			do Output.moveCursor(1, 7);
+			do Output.printInt(score);
+			return;
+		}
+		return;
+	}	
+	
+	method void run() {
+		/** start the game loop, keep tracking frames passed (50 fps) */
+		do Screen.clearScreen();
+		do Output.moveCursor(0, 0);
+		do Output.printString("The game begins!");
+		do Sys.wait(1000);
+		do Screen.clearScreen();
+		do Output.moveCursor(1, 0);
+		do Output.printString("Score: 0");
+		do Output.moveCursor(2, 0);
+		do Output.printString("Array keys to change direction");
+		do Output.moveCursor(3, 0);
+		do Output.printString("Z key to slash 2 units far");
+		do Output.moveCursor(4, 0);
+		do Output.printString("Get 30 scores to win");
+		do man.draw();
+		let exit = false;
+		
+		
+		/** use the current frames passed number to set seed */
+		do Random.setSeed(frames_passed);
+	
+		/** Create an array of 30 enemies */
+		let enemy_counter = 0;
+		let enemies = Array.new(30);
+		let enemies_to_spawn = 1;
+		while (enemy_counter < 30) {
+			let new_enemy_direction = Random.randRange(3); 
+			let enemies[enemy_counter] = Enemy.new(new_enemy_direction);
+			let current_enemy = enemies[enemy_counter];
+			let current_enemy_speed = setEnemySpeed(enemy_counter);
+			do current_enemy.setSpeed(current_enemy_speed);
+			let enemy_counter = enemy_counter + 1;
+			let seed = Random.randRange(47);
+			do Random.setSeed(seed);
+		}
+
+		/** game loop, ends only when the Q key is pressed, enemy collide with man, or get 30 scores */
+		while (~exit) {	
+		
+			/** Keep looping when no key pressed */
+			while ((key = 0) & (~exit)) {
+				let key = Keyboard.keyPressed();
+				let frames_passed = advance_frames(frames_passed);
+				let enemy_counter = 0;
+				
+				/** move every spawned enemy and check if any clashes with man */
+				while (enemy_counter < enemies_to_spawn) {
+					let current_enemy = enemies[enemy_counter];
+					do current_enemy.move(frames_passed); // make every enemy move
+					do collide(man, current_enemy); //check if enemy collide with man
+					let enemy_counter = enemy_counter + 1;
+				}
+
+				let enemies_to_spawn = spawnEnemy(enemies_to_spawn);
+			}
+			
+			
+			/** Slash at enemy when Z key pressed */
+			if (key = 90) { 
+				do man.slash(); 		
+				let enemy_counter = 0;
+				while (enemy_counter < enemies_to_spawn) { //checking if any enemy spawned get hit 
+					let current_enemy = enemies[enemy_counter];
+					do kill(man, current_enemy);
+					let enemy_counter = enemy_counter + 1;
+					do checkWin();
+				}
+			}
+			
+			/** Change man direction when array keys pressed */
+			if (key = 130) { do man.setDirection(0); }
+			if (key = 131) { do man.setDirection(1); }
+			if (key = 132) { do man.setDirection(2); }
+			if (key = 133) { do man.setDirection(3); }
+			
+			/** if Q key pressed, halt game */
+			if (key = 81)  { 
+				let exit = true; 
+				do Output.moveCursor(0, 0);
+				do Output.printString("Game halted!");
+			}
+				
+			
+			/** Wait for the pressed key to be released and keep looping */
+			while ((~(key = 0))& (~exit)) {
+				let key = Keyboard.keyPressed();
+				let frames_passed = advance_frames(frames_passed);
+				let enemy_counter = 0;
+				while (enemy_counter < enemies_to_spawn) {
+					let current_enemy = enemies[enemy_counter];
+					do current_enemy.move(frames_passed);
+					do collide(man, current_enemy);
+					let enemy_counter = enemy_counter + 1;
+				}
+				let enemies_to_spawn = spawnEnemy(enemies_to_spawn);
+			}
+		}
+		return;
+	}
+	
+	/** Higher enemies' speed for every 10 enemies */
+	method int setEnemySpeed(int enemy_counter) {
+		if (enemy_counter < 10) {
+			return 40;
+		}
+		if (enemy_counter < 20) {
+			return 25;
+		}
+		return 10;
+	}
+	
+	/** change new enemy spawning speed depending on how many scores gained */
+	method int spawnEnemy(int enemies_to_spawn) {
+		var int spawn_speed;
+		var int m;
+	
+		let spawn_speed = getSpawnSpeed();
+		let m = Tools.modulo(frames_passed, spawn_speed);
+
+		if (enemies_to_spawn = 30) { // stop spawning enemies when they reach 30 
+			return enemies_to_spawn;
+		}
+		if (m = 0) { //spawn new enemy for every designated duration 
+			return (enemies_to_spawn + 1);
+		}
+		return enemies_to_spawn;
+	}
+	
+	method void start() {
+		/** give game instructions, wait to start the game */
+		var boolean started;
+		let started = true;
+		while (started) {
+		
+			/** Keep looping while no key pressed */
+			while (key = 0) {
+				let key = Keyboard.keyPressed();
+				let frames_passed = advance_frames(frames_passed);	
+			}
+			
+			/** When Enter pressed, clear screen, set exit to false, draw man and enemies, start game */
+			if (key = 128) { 
+				let started = false;
+				do run(); 
+			}
+			while (~(key = 0)) {
+				let key = Keyboard.keyPressed();
+			}
+		}
+		return;
+	}
+}
+	
